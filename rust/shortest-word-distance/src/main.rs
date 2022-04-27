@@ -16,28 +16,28 @@ impl Solution {
             }
         }
 
-        let mut shortest = i32::MAX;
         let mut i = 0;
         let mut j = 0;
+        let mut smallest = i32::MAX;
         while i < w1_idxs.len() && j < w2_idxs.len() {
-            let w1_idx = w1_idxs[i];
-            let w2_idx = w2_idxs[j];
-            let dist = match w1_idx.cmp(&w2_idx) {
+            let i_val = w1_idxs[i];
+            let j_val = w2_idxs[j];
+            let dist = match i_val.cmp(&j_val) {
                 Ordering::Less => {
                     i += 1;
-                    w2_idx - w1_idx
+                    j_val - i_val
                 },
                 Ordering::Greater => {
                     j += 1;
-                    w1_idx - w2_idx
+                    i_val - j_val
                 },
-                Ordering::Equal => panic!("Implies two words in the same slot."),
+                Ordering::Equal => panic!("implies two words in one slot"),
             };
 
-            shortest = cmp::min(shortest, dist);
+            smallest = cmp::min(dist, smallest);
         }
 
-        shortest
+        smallest
     }
 }
 
