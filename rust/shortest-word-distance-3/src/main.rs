@@ -5,63 +5,55 @@ use std::cmp::Ordering;
 struct Solution {}
 
 impl Solution {
-    fn build_idx(words_dict: &Vec<String>, word: &str) -> Vec<i32> {
-        let mut idx = Vec::new();
+    fn build_idx_list(words_dict: &Vec<String>, word: &str) -> Vec<i32> {
+        let mut idx_list = Vec::new();
         for (i, w) in words_dict.iter().enumerate() {
             if *w == word {
-                idx.push(i as i32);
+                idx_list.push(i as i32);
             }
         }
 
-        idx
+        idx_list
     }
 
-    pub fn shortest_word_distance(
-        words_dict: Vec<String>,
-        word1: String,
-        word2: String
-    ) -> i32 {
-        if word1 == word2 {
-            let word_idx = Self::build_idx(&words_dict, &word1);
-
-            if word_idx.len() < 2 {
-                panic!("precondition violation");
-            }
-
-            let mut shortest = i32::MAX;
-            for i in 1..word_idx.len() {
-                let dist = word_idx[i] - word_idx[i - 1];
-                shortest = cmp::min(dist, shortest);
-            }
-
-            return shortest
+    fn single_word(words_dict: &Vec<String>, word: &str) -> i32 {
+        let idx_list = Self::build_idx_list(words_dict, word);
+        let mut shortest = i32::MAX;
+        for i in 1..idx_list.len() {
+            let dist = idx_list[i] - idx_list[i - 1];
+            shortest = cmp::min(dist, shortest);
         }
 
-        let word1_idx = Self::build_idx(&words_dict, &word1);
-        let word2_idx = Self::build_idx(&words_dict, &word2);
+        shortest
+    }
+
+    pub fn shortest_word_distance(words_dict: Vec<String>, word1: String, word2: String) -> i32 {
+        if word1 == word2 {
+            return Self::single_word(&words_dict, &word2);
+        }
+
+        let w1_idx_list = Self::build_idx_list(&words_dict, &word1);
+        let w2_idx_list = Self::build_idx_list(&words_dict, &word2);
 
         let mut i = 0;
         let mut j = 0;
         let mut shortest = i32::MAX;
-        while i < word1_idx.len() && j < word2_idx.len() {
-            let i_val = word1_idx[i];
-            let j_val = word2_idx[j];
-
+        while i < w1_idx_list.len() && j < w2_idx_list.len() {
+            let i_val = w1_idx_list[i];
+            let j_val = w2_idx_list[j];
             let dist = match i_val.cmp(&j_val) {
                 Ordering::Less => {
                     i += 1;
                     j_val - i_val
-                },
+                }
                 Ordering::Greater => {
                     j += 1;
                     i_val - j_val
-                },
-                Ordering::Equal => {
-                    panic!("two words in the same slot");
                 }
+                Ordering::Equal => panic!("wat"),
             };
 
-            shortest = cmp::min(shortest, dist);
+            shortest = cmp::min(dist, shortest);
         }
 
         shortest
@@ -78,9 +70,24 @@ mod tests {
     fn test_basic() {
         assert_eq!(
             S::shortest_word_distance(
-                vec!["hi", "ho", "hi"].iter().map(|e| e.to_string()).collect(),
+                vec!["hi", "ho", "hi"]
+                    .iter()
+                    .map(|e| e.to_string())
+                    .collect(),
                 "hi".to_string(),
                 "hi".to_string()
+            ),
+            2
+        );
+
+        assert_eq!(
+            S::shortest_word_distance(
+                vec!["hi", "ho", "mom", "hey", "ho", "mom"]
+                    .iter()
+                    .map(|e| e.to_string())
+                    .collect(),
+                "hi".to_string(),
+                "mom".to_string()
             ),
             2
         );
