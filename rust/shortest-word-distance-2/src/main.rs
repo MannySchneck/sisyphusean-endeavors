@@ -1,24 +1,25 @@
-use std::collections::HashMap;
+// https://leetcode.com/problems/shortest-word-distance-ii/submissions/
 use std::cmp;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 
 impl WordDistance {
-
     fn new(wordsDict: Vec<String>) -> Self {
-        let mut wd = WordDistance{
+        let mut wd = WordDistance {
             word_idxs: HashMap::new(),
         };
 
         for (i, w) in wordsDict.into_iter().enumerate() {
-            wd.word_idxs.entry(w)
-                .and_modify(| e | e.push(i as i32))
+            wd.word_idxs
+                .entry(w)
+                .and_modify(|e| e.push(i as i32))
                 .or_insert(vec![i as i32]);
         }
 
         wd
     }
 
-    fn shortest(&self, word1: String, word2: String) -> i32 {
+    pub fn shortest_word_distance(&self, word1: String, word2: String) -> i32 {
         let word1_idxs = match self.word_idxs.get(&word1) {
             Some(idxs) => idxs,
             None => return -1,
@@ -40,11 +41,11 @@ impl WordDistance {
                 Ordering::Less => {
                     i += 1;
                     j_val - i_val
-                },
+                }
                 Ordering::Greater => {
                     j += 1;
                     i_val - j_val
-                },
+                }
                 Ordering::Equal => panic!("Implies two words in one vec slot"),
             };
 
@@ -52,7 +53,7 @@ impl WordDistance {
         }
 
         shortest
-   }
+    }
 }
 
 #[derive(Debug)]
@@ -68,8 +69,18 @@ mod tests {
 
     #[test]
     fn test_basic() {
-        let wd = WD::new(vec!["foo".to_string(), "bar".to_string(), "baz".to_string()]);
-        assert_eq!(wd.shortest("foo".to_string(), "bar".to_string()), 1);
-        assert_eq!(wd.shortest("foo".to_string(), "baz".to_string()), 2);
+        let wd = WD::new(vec![
+            "foo".to_string(),
+            "bar".to_string(),
+            "baz".to_string(),
+        ]);
+        assert_eq!(
+            wd.shortest_word_distance("foo".to_string(), "bar".to_string()),
+            1
+        );
+        assert_eq!(
+            wd.shortest_word_distance("foo".to_string(), "baz".to_string()),
+            2
+        );
     }
 }
