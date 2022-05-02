@@ -5,27 +5,25 @@ fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
         return vec![-1, -1];
     }
 
-    let mut search_index = HashMap::new();
+    let mut search_idx = HashMap::new();
 
     for (i, n) in nums.iter().enumerate() {
-        search_index.insert(n, i);
+        search_idx.insert(n, i);
     }
 
-    for (j, n) in nums.iter().enumerate() {
+    for (i, n) in nums.iter().enumerate() {
         let complement = target - n;
-        match search_index.get(&complement) {
-            Some(i) => {
-                if *i != j {
-                    return vec![*i as i32, j as i32];
+        match search_idx.get(&complement) {
+            Some(j) => {
+                if i != *j {
+                    return vec![*j as i32, i as i32];
                 }
-            },
-            None => {
-                continue;
-            },
+            }
+            None => continue,
         }
     }
 
-    return vec![-1, -1];
+    vec![-1, -1]
 }
 
 #[cfg(test)]

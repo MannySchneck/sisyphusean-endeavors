@@ -5,39 +5,40 @@ use std::cmp::Ordering;
 
 impl Solution {
     fn shortest_distance(words: Vec<String>, word1: String, word2: String) -> i32 {
-        let mut w1_idxs = Vec::new();
-        let mut w2_idxs = Vec::new();
+        let mut word1_idx_list = Vec::new();
+        let mut word2_idx_list = Vec::new();
         for (i, w) in words.iter().enumerate() {
             if *w == word1 {
-                w1_idxs.push(i as i32);
+                word1_idx_list.push(i as i32);
             }
+
             if *w == word2 {
-                w2_idxs.push(i as i32);
+                word2_idx_list.push(i as i32);
             }
         }
 
         let mut i = 0;
         let mut j = 0;
-        let mut smallest = i32::MAX;
-        while i < w1_idxs.len() && j < w2_idxs.len() {
-            let i_val = w1_idxs[i];
-            let j_val = w2_idxs[j];
+        let mut shortest = i32::MAX;
+        while i < word1_idx_list.len() && j < word2_idx_list.len() {
+            let i_val = word1_idx_list[i];
+            let j_val = word2_idx_list[j];
             let dist = match i_val.cmp(&j_val) {
                 Ordering::Less => {
                     i += 1;
                     j_val - i_val
-                },
+                }
                 Ordering::Greater => {
                     j += 1;
                     i_val - j_val
-                },
-                Ordering::Equal => panic!("implies two words in one slot"),
+                }
+                Ordering::Equal => panic!("Implies word collision"),
             };
 
-            smallest = cmp::min(dist, smallest);
+            shortest = cmp::min(dist, shortest);
         }
 
-        smallest
+        shortest
     }
 }
 
@@ -51,28 +52,45 @@ mod tests {
 
     #[test]
     fn test_next_to() {
-        assert_eq!(S::shortest_distance(vec!["hi".to_string(), "mom".to_string()], "hi".to_string(), "mom".to_string()), 1);
+        assert_eq!(
+            S::shortest_distance(
+                vec!["hi".to_string(), "mom".to_string()],
+                "hi".to_string(),
+                "mom".to_string()
+            ),
+            1
+        );
     }
 
     #[test]
     fn test_distal_one() {
-        assert_eq!(S::shortest_distance(vec!["hi".to_string(), "bob".to_string(), "mom".to_string()], "hi".to_string(), "mom".to_string()), 2);
+        assert_eq!(
+            S::shortest_distance(
+                vec!["hi".to_string(), "bob".to_string(), "mom".to_string()],
+                "hi".to_string(),
+                "mom".to_string()
+            ),
+            2
+        );
     }
 
     #[test]
     fn test_multiple_possible() {
-        assert_eq!(S::shortest_distance(
-            vec![
+        assert_eq!(
+            S::shortest_distance(
+                vec![
+                    "hi".to_string(),
+                    "jack".to_string(),
+                    "jim".to_string(),
+                    "mom".to_string(),
+                    "mom".to_string(),
+                    "dad".to_string(),
+                    "hi".to_string()
+                ],
                 "hi".to_string(),
-                "jack".to_string(),
-                "jim".to_string(),
-                "mom".to_string(),
-                "mom".to_string(),
-                "dad".to_string(),
-                "hi".to_string()
-            ],
-            "hi".to_string(),
-            "mom".to_string()
-        ), 2);
+                "mom".to_string()
+            ),
+            2
+        );
     }
 }

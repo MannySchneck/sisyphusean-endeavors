@@ -4,35 +4,34 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 impl WordDistance {
-    fn new(wordsDict: Vec<String>) -> Self {
-        let mut wd = WordDistance {
-            word_idxs: HashMap::new(),
-        };
-
-        for (i, w) in wordsDict.into_iter().enumerate() {
-            wd.word_idxs
-                .entry(w)
-                .and_modify(|e| e.push(i as i32))
+    fn new(words_dict: Vec<String>) -> Self {
+        let mut word_idxs = HashMap::new();
+        for (i, word) in words_dict.into_iter().enumerate() {
+            word_idxs
+                .entry(word)
+                .and_modify(|e: &mut Vec<i32>| e.push(i as i32))
                 .or_insert(vec![i as i32]);
         }
 
-        wd
+        WordDistance {
+            word_idxs: word_idxs,
+        }
     }
 
-    pub fn shortest_word_distance(&self, word1: String, word2: String) -> i32 {
+    fn shortest(&self, word1: String, word2: String) -> i32 {
         let word1_idxs = match self.word_idxs.get(&word1) {
-            Some(idxs) => idxs,
-            None => return -1,
+            Some(v) => v,
+            None => panic!("Words are supposed to be in the list"),
         };
+
         let word2_idxs = match self.word_idxs.get(&word2) {
-            Some(idxs) => idxs,
-            None => return -1,
+            Some(v) => v,
+            None => panic!("Words are supposed to be in the list"),
         };
 
         let mut i = 0;
         let mut j = 0;
         let mut shortest = i32::MAX;
-
         while i < word1_idxs.len() && j < word2_idxs.len() {
             let i_val = word1_idxs[i];
             let j_val = word2_idxs[j];
@@ -46,7 +45,7 @@ impl WordDistance {
                     j += 1;
                     i_val - j_val
                 }
-                Ordering::Equal => panic!("Implies two words in one vec slot"),
+                Ordering::Equal => panic!("two words can't be in the same slot"),
             };
 
             shortest = cmp::min(shortest, dist);
@@ -74,13 +73,7 @@ mod tests {
             "bar".to_string(),
             "baz".to_string(),
         ]);
-        assert_eq!(
-            wd.shortest_word_distance("foo".to_string(), "bar".to_string()),
-            1
-        );
-        assert_eq!(
-            wd.shortest_word_distance("foo".to_string(), "baz".to_string()),
-            2
-        );
+        assert_eq!(wd.shortest("foo".to_string(), "bar".to_string()), 1);
+        assert_eq!(wd.shortest("foo".to_string(), "baz".to_string()), 2);
     }
 }
